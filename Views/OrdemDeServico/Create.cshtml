@@ -1,0 +1,49 @@
+@model SelectListEmCascata.Models.OrdemDeServico
+@{
+    Layout = null;   
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nova Ordem de Serviço</title>
+</head>
+<body>
+    <form>
+        <label>Clientes</label>
+        <select asp-for="ClienteId" asp-items="@(new SelectList(@ViewBag.Clientes, "Id", "Nome"))"
+            id="select-clientes" onchange="atualizarSelect()">
+        </select>
+        <label>Orçamentos</label>
+        <select id="select-orcamentos">
+            <option value="0">Selecione o Cliente</option>
+        </select>
+    </form>
+    <script>
+        const selectClientes = document.querySelector('#select-clientes');
+        const selectOrcamentos = document.querySelector('#select-orcamentos');
+
+        function atualizarSelect() {
+            const url = "/ordemdeservico/"+selectClientes.value;
+            fetch(url).then(response => {
+                return response.json();
+            }).then(data => {
+                montarOption(data);
+            });
+        }
+
+        function montarOption(data) {
+            while(selectOrcamentos.length){
+                selectOrcamentos.remove(0);
+            }
+
+            data.forEach(function(orcamento){
+                let option = document.createElement("option");
+                option.value = orcamento.id;
+                option.text = `Id: ${orcamento.id} Total: ${orcamento.total}`;
+                selectOrcamentos.appendChild(option);
+            });
+        }
+    </script>
+</body>
+</html>
